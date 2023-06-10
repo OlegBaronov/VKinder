@@ -35,7 +35,7 @@ class VkTools:
         try:
             users = self.api.method('users.search',
                                       {
-                                     'count': 1,
+                                     'count': 10,
                                     'hometown': params['city'],
                                      'sex': 1 if params['sex'] == 2 else 2,
                                      'has_photo': True,
@@ -47,6 +47,12 @@ class VkTools:
             users = []
             print(f'error = {e}')
         return users
+        result = [{'name': item['first_name'] + '' + item['last_name'],
+                    'id': item['id'],
+                   } for item in users[items] if item['is closed'] is False
+                  ]
+        return reult
+
 
 
 
