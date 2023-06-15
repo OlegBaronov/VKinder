@@ -25,6 +25,15 @@ class Botinterface():
                        'random_id': get_random_id()}
                       )
 
+    def worksheet_photo_string(self, id):
+        self.worksheets = self.vk_tools.search_worksheet(self.params, self.offset)
+        worksheet = self.worksheets.pop()
+        photos = self.vk_tools.get_photos(worksheet['id'])
+        photo_string = ''
+        for photo in photos:
+            photo_string += f'photo{photo["owner_id"]}_{photo["id"]},'
+        return photo_string
+
 
     def event_handler(self):
         for event in self.longpoll.listen():
@@ -35,12 +44,7 @@ class Botinterface():
                 elif event.text.lower() == 'поиск':
                     self.message_send(
                         event.user_id, 'Начинаем поиск')
-                    self.worksheets = self.vk_tools.search_worksheet(self.params, self.offset)
-                    worksheet = self.worksheets.pop()
-                    photos = self.vk_tools.get_photos(worksheet['id'])
-                    photo_string = ''
-                    for photo in photos:
-                        photo_string += f'photo{photo["owner_id"]}_{photo["id"]},'
+                    self.worksheet_photo_string("id")
                     if self.worksheets:
                         worksheet = self.worksheets.pop()
                         photos = self.vk_tools.get_photos(worksheet['id'])
@@ -48,13 +52,7 @@ class Botinterface():
                         for photo in photos:
                             photo_string += f'photo{photo["owner_id"]}_{photo["id"]},'
                     else:
-                        self.worksheets = self.vk_tools.search_worksheet(
-                            self.params, self.offset)
-                    worksheet = self.worksheets.pop()
-                    photos = self.vk_tools.get_photos(worksheet['id'])
-                    photo_string = ''
-                    for photo in photos:
-                        photo_string += f'photo{photo["owner_id"]}_{photo["id"]},'
+                        self.worksheet_photo_string("id")
                     self.offset += 50
                     self.message_send(
                         event.user_id,
