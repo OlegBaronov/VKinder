@@ -14,24 +14,23 @@ class VkTools:
         now = datetime.now().year
         return now - int(user_yera) if user_yera is not None else None
 
-    def request_city(self, user_id):
-        self.message_send(
-            user_id, 'Укажите место жительства')
-        for event in self.longpoll.listen():
-            if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                city = event.text.lower()
-        return city
-
-    def request_bdate(self, user_id):
-        self.message_send(
-            user_id, 'Укажите ваш возраст')
-        for event in self.longpoll.listen():
-            if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                year = int.event.text.lower()
-                if year in range (15, 100):
-                    return year
-                else: self.message_send(
-            user_id, 'возраст указан некорректно')
+    # def request_city(self, user_id):
+    #     self.message_send(self, user_id, 'укажите место житедьства')
+    #     for event in self.longpoll.listen():
+    #         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+    #             city = event.text.lower()
+    #         return city
+    #
+    # def request_bdate(self, user_id):
+    #     self.message_send(
+    #         user_id, 'Укажите ваш возраст')
+    #     for event in self.longpoll.listen():
+    #         if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+    #             year = int.event.text.lower()
+    #             if year in range (15, 100):
+    #                 return year
+    #             else: self.message_send(
+    #         user_id, 'возраст указан некорректно')
 
 
     def get_profile_info(self, user_id):
@@ -44,11 +43,11 @@ class VkTools:
         except ApiError as e:
             info ={}
             print(f'error = {e}')
-        result = {'name': (info['first_name']+ '' + info['last_name']) if
+        result = {'name': (info['first_name'] + '' + info['last_name']) if
                   'first_name' in info and 'last_name' in info else None,
                   'sex': info.get('sex'),
-                  'city': info.get('city')['title'] if info.get('city') is not None else self.request_city(user_id),
-                  'year': self.bdate_toyear(info.get('bdate')) if not None else self.request_bdate(user_id)
+                  'city': info.get('city')['title'] if info.get('city') is not None else None,
+                  'year': self.bdate_toyear(info.get('bdate')) if not None else None
                 }
         return result
 
@@ -107,7 +106,7 @@ class VkTools:
 
 
 if __name__ == '__main__':
-
+    user_id = 806571703
     tools = VkTools(access_token)
     params = tools.get_profile_info(user_id)
     worksheets = tools.search_worksheet(params, 50)

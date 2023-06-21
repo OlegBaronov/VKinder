@@ -23,13 +23,6 @@ class Botinterface():
         now = datetime.now().year
         return now - int(user_yera) if user_yera is not None else None
 
-    def request_city(self, user_id):
-        self.message_send(
-            user_id, 'Укажите место жительства')
-        for event in self.longpoll.listen():
-            if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                city = event.text.lower()
-        return city
 
     def message_send(self, user_id, message, attachment=None):
         self.vk.method('messages.send',
@@ -38,6 +31,10 @@ class Botinterface():
                        'attachment': attachment,
                        'random_id': get_random_id()}
                       )
+
+
+
+
 
     def worksheet_photo_string(self, id):
         self.worksheets = self.vk_tools.search_worksheet(self.params, self.offset)
@@ -49,14 +46,18 @@ class Botinterface():
         return photo_string
 
 
+
+
     def event_handler(self):
         for event in self.longpoll.listen():
             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
                 if event.text.lower() == 'привет' or event.text.lower() == 'здравствуйте':
                     self.params = self.vk_tools.get_profile_info(event.user_id)
                     self.message_send(event.user_id, f'привет, {self.params["name"]}')
-                    if self.params['city'] is None:
-                        self.params['city'] = {self.request_city('user_id')}
+
+                        # self.message_send(event.user_id, 'укажите место жительства')
+                        # self.params['city'] = {VkEventType.MESSAGE_NEW and event.to_me}
+
                 elif event.text.lower() == 'поиск':
                     self.message_send(
                         event.user_id, 'Начинаем поиск')
@@ -82,10 +83,16 @@ class Botinterface():
                 else:
                     self.message_send(event.user_id, 'непонял, измените вопрос')
 
+            if self.params.get('city') is None:
+                self.params['city'] = self.requests_city(event.user_id)
 
 
-
-
+    def requests_city(self, user_id):
+        self.message_send(user_id, 'укажите место жительства')
+        for event in self.longpoll.listen():
+            if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+                # self.message_send(user_id, 'Для поиска наберите поиск')
+                return event.text.title()
 
 
 
