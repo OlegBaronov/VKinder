@@ -33,7 +33,7 @@ class VkTools:
                   'city': info.get('city')['title'] if info.get('city') is not None else None,
                   'year': self.bdate_toyear(info.get('bdate')) if info.get('bdate') is not None else None
                   }
-        return info
+        return result
 
 
     def search_worksheet(self, params, offset):

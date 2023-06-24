@@ -5,6 +5,7 @@ from vk_api.utils import get_random_id
 from connection_data import community_token, access_token
 from core import VkTools
 from data_store import engine
+from data_store import Viewed
 import psycopg2
 import sqlalchemy
 
@@ -18,7 +19,7 @@ class Botinterface():
         self.params = {}
         self.worksheets = []
         self.offset = 50
-
+        self.viewed = Viewed
     def bdate_toyear(self, bdate):
         user_yera = bdate.split('.')[2] if bdate is not None else None
         now = datetime.now().year
@@ -37,8 +38,9 @@ class Botinterface():
 
 
 
-    def worksheet_photo_string(self, id, worksheet):
-        photos = self.vk_tools.get_photos(worksheet['id'])
+    def worksheet_photo_string(self, worksheets):
+        worksheet = worksheets.pop()
+        photos = self.vk_tools.get_photos(worksheet["id"])
         photo_string = ''
         for photo in photos:
             photo_string += f'photo{photo["owner_id"]}_{photo["id"]},'
@@ -63,15 +65,13 @@ class Botinterface():
                     self.message_send(
                         event.user_id, 'Начинаем поиск')
                     if self.worksheets:
-                        worksheet = self.worksheets.pop()
-                        self.worksheet_photo_string(self, 'id', 'worksheet')
+                        photo_string = self.worksheet_photo_string(self.worksheets)
 
                     else:
                         self.worksheets = self.vk_tools.search_worksheet(self.params, self.offset)
-
                         worksheet = self.worksheets.pop()
-                        while self.check_user(engine, event.user_id, worksheet['id']) is False:
-                            photo_string = self.worksheet_photo_string(self, 'id', 'worksheet')
+                        while self.viewed.check_user(engine, event.user_id, worksheet['id']) is False:
+                            photo_string = self.worksheet_photo_string(self.worksheets)
                             self.offset += 50
                             worksheet = self.worksheets.pop()
 
@@ -93,11 +93,14 @@ class Botinterface():
 
 
     def requests_city(self, user_id):
-        self.message_send(user_id, 'укажите место жительства')
-        for event in self.longpoll.listen():
-            if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                # self.message_send(user_id, 'Для поиска наберите поиск')
-                return event.text.title()
+        # while True:
+            self.message_send(user_id, 'укажите место жительства')
+            for event in self.longpoll.listen():
+                if event.type == VkEventType.MESSAGE_NEW and event.to_me:
+                    self.message_send(user_id, 'город запомнен')
+                    return "event.text.title()"
+                # break
+
 
     def requests_bdate(self, user_id):
         self.message_send(user_id, 'укажите ваш возраст(числом)')

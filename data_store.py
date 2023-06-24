@@ -21,25 +21,25 @@ class Viewed(Base):
 
 
 
-Base.metadata.create_all(engine)
+    Base.metadata.create_all(engine)
 
 
 
 
-def add_user(engine, profile_id, worksheet_id):
-    with Session(engine) as session:
-        to_bd = Viewed(profile_id=profile_id, worksheet_id=worksheet_id)
+    def add_user(engine, profile_id, worksheet_id):
+        with Session(engine) as session:
+            to_bd = Viewed(profile_id=profile_id, worksheet_id=worksheet_id)
         session.add(to_bd)
         session.commit()
 
 
-def check_user(engine, profile_id, worksheet_id):
-    with Session(engine) as session:
-        from_bd = session.query(Viewed).filter(
+    def check_user(engine, profile_id, worksheet_id):
+        with Session(engine) as session:
+            from_bd = session.query(Viewed).filter(
             Viewed.profile_id == profile_id,
             Viewed.worksheet_id == worksheet_id
         ).first()
-    return True if from_bd else False
+        return True if from_bd else False
 
 
 
