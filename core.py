@@ -53,7 +53,7 @@ class VkTools:
             users = []
             print(f'error = {e}')
 
-        result = [{'name': item['first_name'] + '' + item['last_name'],
+        result = [{'name': item['first_name'] + ' ' + item['last_name'],
                     'id': item['id'],
                    } for item in users['items'] if item['is_closed'] is False
                   ]
