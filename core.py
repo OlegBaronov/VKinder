@@ -39,10 +39,10 @@ class VkTools:
     def search_worksheet(self, params, offset):
         try:
             users = self.vkapi.method('users.search',
-                                      {
+                                    {
                                      'count': 50,
-                                      'offset': offset,
-                                    'hometown': params['city'],
+                                     'offset': offset,
+                                     'hometown': params['city'],
                                      'sex': 1 if params['sex'] == 2 else 2,
                                      'has_photo': True,
                                      'age_from': params['year'] - 3,

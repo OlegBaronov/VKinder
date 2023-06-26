@@ -38,13 +38,7 @@ class Botinterface():
 
 
 
-    def worksheet_photo_string(self, worksheets):
-        worksheet = worksheets.pop()
-        photos = self.vk_tools.get_photos(worksheet["id"])
-        photo_string = ''
-        for photo in photos:
-            photo_string += f'photo{photo["owner_id"]}_{photo["id"]},'
-        return photo_string
+
 
 
 
@@ -55,33 +49,41 @@ class Botinterface():
                 if event.text.lower() == 'привет' or event.text.lower() == 'здравствуйте':
                     self.params = self.vk_tools.get_profile_info(event.user_id)
                     self.message_send(event.user_id, f'привет, {self.params["name"]}')
-
                     if self.params.get('city') is None:
                         self.params['city'] = self.requests_city(event.user_id)
+                        # print(self.params["city"])
                     if self.params.get('year') is None:
                         self.params['year'] = self.requests_bdate(event.user_id)
-
                 elif event.text.lower() == 'поиск':
                     self.message_send(
                         event.user_id, 'Начинаем поиск')
                     if self.worksheets:
-                        photo_string = self.worksheet_photo_string(self.worksheets)
+                        self.worksheet_photo_string('id')
+                        worksheet = self.worksheets.pop()
+                        photos = self.vk_tools.get_photos(worksheet['id'])
+                        photo_string = ''
+                        for photo in photos:
+                            photo_string += f'photo{photo["owner_id"]}_{photo["id"]},'
 
                     else:
                         self.worksheets = self.vk_tools.search_worksheet(self.params, self.offset)
                         worksheet = self.worksheets.pop()
-                        while self.viewed.check_user(engine, event.user_id, worksheet['id']) is False:
-                            photo_string = self.worksheet_photo_string(self.worksheets)
-                            self.offset += 50
+                        i = 1
+                        while i<= len(self.worksheets):
                             worksheet = self.worksheets.pop()
-
+                            if self.viewed.check_user(engine, event.user_id, worksheet['id']) is False:
+                                photo_string = self.worksheet_photo_string(id)
+                                break
+                            self.offset += 50
+                            i += 1
+                        photo_string = self.worksheet_photo_string(id)
                     self.message_send(
                         event.user_id,
                         f'имя: {worksheet["name"]} ссылка: vk.com/{worksheet["id"]}',
                         attachment=photo_string
                         )
 
-                    self.add_user(engine, event.user_id, worksheet['id'])
+                    self.viewed.add_user(engine, event.user_id, worksheet['id'])
 
                 elif event.text.lower() == 'пока' or event.text.lower() == 'до свидания':
                     self.message_send(event.user_id, 'всего хорошего!')
@@ -93,13 +95,12 @@ class Botinterface():
 
 
     def requests_city(self, user_id):
-        # while True:
             self.message_send(user_id, 'укажите место жительства')
             for event in self.longpoll.listen():
                 if event.type == VkEventType.MESSAGE_NEW and event.to_me:
                     self.message_send(user_id, 'город запомнен')
-                    return "event.text.title()"
-                # break
+                    return event.text.title()
+
 
 
     def requests_bdate(self, user_id):
@@ -109,7 +110,14 @@ class Botinterface():
                 # self.message_send(user_id, 'Для поиска наберите поиск')
                 return int(event.text)
 
-
+    def worksheet_photo_string(self, id):
+        self.worksheets = self.vk_tools.search_worksheet(self.params, self.offset)
+        worksheet = self.worksheets.pop()
+        photos = self.vk_tools.get_photos(worksheet["id"])
+        photo_string = ''
+        for photo in photos:
+            photo_string += f'photo{photo["owner_id"]}_{photo["id"]},'
+        return photo_string
 
 
 
