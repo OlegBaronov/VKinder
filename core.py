@@ -20,7 +20,7 @@ class VkTools:
     def get_profile_info(self, user_id):
         try:
             info, = self.vkapi.method('users.get',
-                                {'users_id': user_id,
+                                {'user_id': user_id,
                                  'fields': 'sex, relation, city, bdate'
                                  }
                                  )
@@ -42,11 +42,11 @@ class VkTools:
                                     {
                                      'count': 50,
                                      'offset': offset,
-                                     'hometown': params['city'],
-                                     'sex': 1 if params['sex'] == 2 else 2,
+                                     'hometown': params["event.user_id"]['city'],
+                                     'sex': 1 if params["event.user_id"]['sex'] == 2 else 2,
                                      'has_photo': True,
-                                     'age_from': params['year'] - 3,
-                                     'age_to': params['year'] + 3
+                                     'age_from': params["event.user_id"]['year'] - 3,
+                                     'age_to': params["event.user_id"]['year'] + 3
                                     }
                                     )
         except ApiError as e:
@@ -89,4 +89,4 @@ class VkTools:
 
 
 
-# if __name__ == '__main__':
+

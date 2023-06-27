@@ -56,44 +56,24 @@ class Botinterface():
         for event in self.longpoll.listen():
             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
                 if event.text.lower() == 'привет' or event.text.lower() == 'здравствуйте':
-                    self.params = self.vk_tools.get_profile_info(event.user_id)
-                    self.message_send(event.user_id, f'привет, {self.params["name"]}')
-                    if self.params.get('city') is None:
-                        self.params['city'] = self.requests_city(event.user_id)
-                    if self.params.get('year') is None:
-                        self.params['year'] = self.requests_bdate(event.user_id)
+                    self.params = {"event.user_id": self.vk_tools.get_profile_info(event.user_id)}
+                    self.message_send(event.user_id, f'привет, {self.params["event.user_id"]["name"]}')
+                    if self.params["event.user_id"].get('city') is None:
+                        self.params["event.user_id"]['city'] = self.requests_city(event.user_id)
+                    if self.params["event.user_id"].get('year') is None:
+                        self.params["event.user_id"]['year'] = self.requests_bdate(event.user_id)
                 elif event.text.lower() == 'поиск':
                     self.message_send(
                         event.user_id, 'Начинаем поиск')
                     if self.worksheets:
                         worksheet, photo_string = self.worksheet_photo_string(event.user_id, engine, self.worksheets)
-                        # i = 1
-                        # while i <= len(self.worksheets):
-                        #     worksheet = self.worksheets.pop()
-                        #     if self.viewed.check_user(engine, event.user_id, worksheet['id']) is False:
-                        #         photos = self.vk_tools.get_photos(worksheet["id"])
-                        #         photo_string = ''
-                        #         for photo in photos:
-                        #             photo_string += f'photo{photo["owner_id"]}_{photo["id"]},'
-                        #         break
-                        #     self.offset += 50
-                        #     i += 1
+
 
 
                     else:
                         self.worksheets = self.vk_tools.search_worksheet(self.params, self.offset)
                         worksheet, photo_string = self.worksheet_photo_string(event.user_id, engine, self.worksheets)
-                        # i = 1
-                        # while i <= len(self.worksheets):
-                        #     worksheet = self.worksheets.pop()
-                        #     if self.viewed.check_user(engine, event.user_id, worksheet['id']) is False:
-                        #         photos = self.vk_tools.get_photos(worksheet["id"])
-                        #         photo_string = ''
-                        #         for photo in photos:
-                        #             photo_string += f'photo{photo["owner_id"]}_{photo["id"]},'
-                        #         break
-                        #     self.offset += 50
-                        #     i += 1
+                       
                     self.message_send(
                         event.user_id,
                         f'имя: {worksheet["name"]} ссылка: vk.com/{worksheet["id"]}',
@@ -124,7 +104,7 @@ class Botinterface():
         self.message_send(user_id, 'укажите ваш возраст(числом)')
         for event in self.longpoll.listen():
             if event.type == VkEventType.MESSAGE_NEW and event.to_me:
-                if 100 < int(event.text) > 1:
+                if 10 < int(event.text) < 100:
                     self.message_send(user_id, 'возраст добавлен')
                     return int(event.text)
                 else:
